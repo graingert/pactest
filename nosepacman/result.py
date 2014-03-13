@@ -5,7 +5,7 @@ from nose.plugins.skip import SkipTest
 from nose.result import TextTestResult
 from nose.util import isclass
 
-from nosepacman.bar import ProgressBar, NullProgressBar
+from nosepacman.pacman import PacmanDisplay, NullDisplay
 from nosepacman.tracebacks import format_traceback, extract_relevant_tb
 from nosepacman.utils import nose_selector, index_of_test_frame
 
@@ -19,26 +19,18 @@ class PacmanResult(TextTestResult):
 
     """
 
-    RESULT_SUCCESS = 0
-    RESULT_FAILURE = 1
-    RESULT_ERROR = 2
-
     def __init__(self, cwd, total_tests, stream, config=None):
         super(PacmanResult, self).__init__(stream, None, 0, config=config)
         self._cwd = cwd
         self._options = config.options
         self._term = Terminal(stream=stream,
                               force_styling=config.options.with_styling)
-        self._results = []
 
         if self._term.is_a_tty or self._options.with_bar:
             # 1 in case test counting failed and returned 0
-            self.bar = ProgressBar(total_tests or 1,
-                                   self._term,
-                                   config.options.bar_filled_color,
-                                   config.options.bar_empty_color)
+            self.display = PacmanDisplay(self._term)
         else:
-            self.bar = NullProgressBar()
+            self.display = NullDisplay()
 
         # Declare errorclass-savviness so ErrorClassPlugins don't monkeypatch
         # half my methods away:
@@ -47,7 +39,6 @@ class PacmanResult(TextTestResult):
     def startTest(self, test):
         """Update the progress bar."""
         super(PacmanResult, self).startTest(test)
-        self.bar.update(nose_selector(test), self.testsRun)
 
     def _printTraceback(self, test, err):
         """Print a nicely formatted traceback.
@@ -82,36 +73,6 @@ class PacmanResult(TextTestResult):
             # trim everything until that. We don't care to see test
             # framework frames.
             extracted_tb = extracted_tb[test_frame_index:]
-
-        with self.bar.dodging():
-            self.stream.write(''.join(
-                format_traceback(
-                    extracted_tb,
-                    exception_type,
-                    exception_value,
-                    self._cwd,
-                    self._term,
-                    self._options.function_color,
-                    self._options.dim_color,
-                    self._options.editor,
-                    self._options.editor_shortcut_template)))
-
-    def _printHeadline(self, kind, test, is_failure=True):
-        """Output a 1-line error summary to the stream if appropriate.
-
-        The line contains the kind of error and the pathname of the test.
-
-        :arg kind: The (string) type of incident the precipitated this call
-        :arg test: The test that precipitated this call
-
-        """
-        if is_failure or self._options.show_advisories:
-            with self.bar.dodging():
-                self.stream.writeln(
-                        '\n' +
-                        (self._term.bold if is_failure else '') +
-                        '%s: %s' % (kind, nose_selector(test)) +
-                        (self._term.normal if is_failure else ''))  # end bold
 
     def _recordAndPrintHeadline(self, test, error_class, artifact):
         """Record that an error-like thing occurred, and print a summary.
@@ -155,9 +116,9 @@ class PacmanResult(TextTestResult):
         # Python 2.7 users get a little bonus: the reason the test was skipped.
         if isinstance(reason, Exception):
             reason = reason.message
-        if reason and self._options.show_advisories:
-            with self.bar.dodging():
-                self.stream.writeln(reason)
+        #if reason and self._options.show_advisories:
+        #    with self.bar.dodging():
+        #        self.stream.writeln(reason)
 
     def addError(self, test, err):
         super(PacmanResult, self).addError(test, err)
@@ -167,25 +128,21 @@ class PacmanResult(TextTestResult):
         is_failure = self._recordAndPrintHeadline(test, err[0], excInfo)
         #if is_failure:
         #    self._printTraceback(test, err)
-        self._results.append(self.RESULT_ERROR)
-        self.stream.writeln('haha')
+        self.display.test_error()
 
     def addFailure(self, test, err):
         super(PacmanResult, self).addFailure(test, err)
-        self._results.append(self.RESULT_FAILURE)
         #self._printHeadline('FAIL', test)
         #self._printTraceback(test, err)
-        self.stream.writeln('hoho')
+        self.display.test_failed()
 
     def addSuccess(self, test):
         super(PacmanResult, self).addSuccess(test)
-        self._results.append(self.RESULT_SUCCESS)
-        self.stream.writeln(':)')
+        self.display.test_passed()
 
     def printSummary(self, start, stop):
         """As a final summary, print number of tests, broken down by result."""
-        self.stream.writeln('Tests completed, running pacman!')
-        self.stream.writeln(repr(self._results))
+        self.display.eat()
         self.printErrors()
         def renderResultType(type, number, is_failure):
             """Return a rendering like '2 failures'.
@@ -220,8 +177,7 @@ class PacmanResult(TextTestResult):
         # Erase progress bar. Bash doesn't clear the whole line when printing
         # the prompt, leaving a piece of the bar. Also, the prompt may not be
         # at the bottom of the terminal.
-        self.bar.erase()
-        self.stream.writeln()
+
         if self.wasSuccessful():
             self.stream.write(self._term.bold_green('OK!  '))
         self.stream.writeln(summary)

@@ -14,7 +14,7 @@ PACMAN_SIGN = u'C'
 CRASH_SIGN = u'X'
 
 
-class PacmanRunner(object):
+class PacmanDisplay(object):
     _locked = False
     _tests_showed = 0
     _queue = []
@@ -82,7 +82,7 @@ class Null(object):
     __enter__ = __exit__ = __getattr__
 
 
-class NullProgressBar(Null):
+class NullDisplay(Null):
     """``ProgressBar`` workalike that does nothing
 
     Comes in handy when you want to have an option to hide the progress bar.

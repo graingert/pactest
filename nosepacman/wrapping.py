@@ -75,9 +75,4 @@ class StreamWrapper(object):
         return getattr(self.stream, name)
 
     def write(self, data):
-        if hasattr(self._plugin, 'bar'):
-            with self._plugin.bar.dodging():
-                self.stream.write(data)
-        else:
-            # Some things write to stderr before the bar is inited.
-            self.stream.write(data)
+        self.stream.write(data)

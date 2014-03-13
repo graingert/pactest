@@ -202,7 +202,3 @@ class PacmanPlugin(Plugin):
                                  verbosity=self.conf.verbosity,
                                  config=self.conf)  # So we don't get a default
                                                     # NoPlugins manager
-
-    def prepareTestResult(self, result):
-        """Hang onto the progress bar so the StreamWrappers can grab it."""
-        self.bar = result.bar
