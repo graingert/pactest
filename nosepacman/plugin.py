@@ -6,18 +6,18 @@ from warnings import warn
 
 from nose.plugins import Plugin
 
-from noseprogressive.runner import ProgressiveRunner
-from noseprogressive.tracebacks import DEFAULT_EDITOR_SHORTCUT_TEMPLATE
-from noseprogressive.wrapping import cmdloop, set_trace, StreamWrapper
+from nosepacman.runner import PacmanRunner
+from nosepacman.tracebacks import DEFAULT_EDITOR_SHORTCUT_TEMPLATE
+from nosepacman.wrapping import cmdloop, set_trace, StreamWrapper
 
-class ProgressivePlugin(Plugin):
+class PacmanPlugin(Plugin):
     """A nose plugin which has a progress bar and formats tracebacks for humans"""
-    name = 'progressive'
+    name = 'pacman'
     _totalTests = 0
     score = 10000  # Grab stdout and stderr before the capture plugin.
 
     def __init__(self, *args, **kwargs):
-        super(ProgressivePlugin, self).__init__(*args, **kwargs)
+        super(PacmanPlugin, self).__init__(*args, **kwargs)
         # Same wrapping pattern as the built-in capture plugin. The lists
         # shouldn't be necessary, but they don't cost much, and I have to
         # wonder why capture uses them.
@@ -61,88 +61,88 @@ class ProgressivePlugin(Plugin):
         pdb.Pdb.cmdloop = self._cmdloop.pop()
 
     def options(self, parser, env):
-        super(ProgressivePlugin, self).options(parser, env)
-        parser.add_option('--progressive-editor',
+        super(PacmanPlugin, self).options(parser, env)
+        parser.add_option('--pacman-editor',
                           type='string',
                           dest='editor',
-                          default=env.get('NOSE_PROGRESSIVE_EDITOR',
+                          default=env.get('NOSE_PACMAN_EDITOR',
                                           env.get('EDITOR', 'vi')),
                           help='The editor to use for the shortcuts in '
                                'tracebacks. Defaults to the value of $EDITOR '
-                               'and then "vi". [NOSE_PROGRESSIVE_EDITOR]')
-        parser.add_option('--progressive-abs',
+                               'and then "vi". [NOSE_PACMAN_EDITOR]')
+        parser.add_option('--pacman-abs',
                           action='store_true',
                           dest='absolute_paths',
-                          default=env.get('NOSE_PROGRESSIVE_ABSOLUTE_PATHS', False),
+                          default=env.get('NOSE_PACMAN_ABSOLUTE_PATHS', False),
                           help='Display paths in traceback as absolute, '
                                'rather than relative to the current working '
-                               'directory. [NOSE_PROGRESSIVE_ABSOLUTE_PATHS]')
-        parser.add_option('--progressive-advisories',
+                               'directory. [NOSE_PACMAN_ABSOLUTE_PATHS]')
+        parser.add_option('--pacman-advisories',
                           action='store_true',
                           dest='show_advisories',
-                          default=env.get('NOSE_PROGRESSIVE_ADVISORIES', False),
+                          default=env.get('NOSE_PACMAN_ADVISORIES', False),
                           help='Show skips and deprecation exceptions in '
                                'addition to failures and errors. '
-                               '[NOSE_PROGRESSIVE_ADVISORIES]')
-        parser.add_option('--progressive-with-styling',
+                               '[NOSE_PACMAN_ADVISORIES]')
+        parser.add_option('--pacman-with-styling',
                           action='store_true',
                           dest='with_styling',
-                          default=env.get('NOSE_PROGRESSIVE_WITH_STYLING', False),
-                          help='nose-progressive automatically omits bold and '
+                          default=env.get('NOSE_PACMAN_WITH_STYLING', False),
+                          help='nose-pacman automatically omits bold and '
                                'color formatting when its output is directed '
                                'to a non-terminal. Specifying '
-                               '--progressive-with-styling forces such '
+                               '--pacman-with-styling forces such '
                                'styling to be output regardless. '
-                               '[NOSE_PROGRESSIVE_WITH_STYLING]')
-        parser.add_option('--progressive-with-bar',
+                               '[NOSE_PACMAN_WITH_STYLING]')
+        parser.add_option('--pacman-with-bar',
                           action='store_true',
                           dest='with_bar',
-                          default=env.get('NOSE_PROGRESSIVE_WITH_BAR', False),
-                          help='nose-progressive automatically omits the '
+                          default=env.get('NOSE_PACMAN_WITH_BAR', False),
+                          help='nose-pacman automatically omits the '
                                'progress bar when its output is directed to a '
                                'non-terminal. Specifying '
-                               '--progressive-with-bar forces the bar to be '
+                               '--pacman-with-bar forces the bar to be '
                                'output regardless. This option implies '
-                               '--progressive-with-styling. '
-                               '[NOSE_PROGRESSIVE_WITH_BAR]')
-        parser.add_option('--progressive-function-color',
+                               '--pacman-with-styling. '
+                               '[NOSE_PACMAN_WITH_BAR]')
+        parser.add_option('--pacman-function-color',
                           type='int',
                           dest='function_color',
-                          default=env.get('NOSE_PROGRESSIVE_FUNCTION_COLOR', 12),
+                          default=env.get('NOSE_PACMAN_FUNCTION_COLOR', 12),
                           help='Color of function names in tracebacks. An '
                                'ANSI color expressed as a number 0-15. '
-                               '[NOSE_PROGRESSIVE_FUNCTION_COLOR]')
-        parser.add_option('--progressive-dim-color',
+                               '[NOSE_PACMAN_FUNCTION_COLOR]')
+        parser.add_option('--pacman-dim-color',
                           type='int',
                           dest='dim_color',
-                          default=env.get('NOSE_PROGRESSIVE_DIM_COLOR', 8),
+                          default=env.get('NOSE_PACMAN_DIM_COLOR', 8),
                           help='Color of de-emphasized text (like editor '
                                'shortcuts) in tracebacks. An ANSI color '
                                'expressed as a number 0-15. '
-                               '[NOSE_PROGRESSIVE_DIM_COLOR]')
-        parser.add_option('--progressive-bar-filled-color',
+                               '[NOSE_PACMAN_DIM_COLOR]')
+        parser.add_option('--pacman-bar-filled-color',
                           type='int',
                           dest='bar_filled_color',
-                          default=env.get('NOSE_PROGRESSIVE_BAR_FILLED_COLOR', 8),
+                          default=env.get('NOSE_PACMAN_BAR_FILLED_COLOR', 8),
                           help="Color of the progress bar's filled portion. An "
                                 'ANSI color expressed as a number 0-15. '
-                               '[NOSE_PROGRESSIVE_BAR_FILLED_COLOR]')
-        parser.add_option('--progressive-bar-empty-color',
+                               '[NOSE_PACMAN_BAR_FILLED_COLOR]')
+        parser.add_option('--pacman-bar-empty-color',
                           type='int',
                           dest='bar_empty_color',
-                          default=env.get('NOSE_PROGRESSIVE_BAR_EMPTY_COLOR', 7),
+                          default=env.get('NOSE_PACMAN_BAR_EMPTY_COLOR', 7),
                           help="Color of the progress bar's empty portion. An "
                                 'ANSI color expressed as a number 0-15. '
-                               '[NOSE_PROGRESSIVE_BAR_EMPTY_COLOR]')
-        parser.add_option('--progressive-editor-shortcut-template',
+                               '[NOSE_PACMAN_BAR_EMPTY_COLOR]')
+        parser.add_option('--pacman-editor-shortcut-template',
                           type='string',
                           dest='editor_shortcut_template',
                           default=env.get(
-                                'NOSE_PROGRESSIVE_EDITOR_SHORTCUT_TEMPLATE',
+                                'NOSE_PACMAN_EDITOR_SHORTCUT_TEMPLATE',
                                 DEFAULT_EDITOR_SHORTCUT_TEMPLATE),
                           help='A str.format() template for the non-code lines'
                                ' of the traceback. '
-                               '[NOSE_PROGRESSIVE_EDITOR_SHORTCUT_TEMPLATE]')
+                               '[NOSE_PACMAN_EDITOR_SHORTCUT_TEMPLATE]')
 
     def configure(self, options, conf):
         """Turn style-forcing on if bar-forcing is on.
@@ -151,12 +151,12 @@ class ProgressivePlugin(Plugin):
         terminal capabilities emit ''.
 
         """
-        super(ProgressivePlugin, self).configure(options, conf)
+        super(PacmanPlugin, self).configure(options, conf)
         if (getattr(options, 'verbosity', 0) > 1 and
             getattr(options, 'enable_plugin_id', False)):
             # TODO: Can we forcibly disable the ID plugin?
             print ('Using --with-id and --verbosity=2 or higher with '
-                   'nose-progressive causes visualization errors. Remove one '
+                   'nose-pacman causes visualization errors. Remove one '
                    'or the other to avoid a mess.')
         if options.with_bar:
             options.with_styling = True
@@ -196,7 +196,7 @@ class ProgressivePlugin(Plugin):
 
     def prepareTestRunner(self, runner):
         """Replace TextTestRunner with something that prints fewer dots."""
-        return ProgressiveRunner(self._cwd,
+        return PacmanRunner(self._cwd,
                                  self._totalTests,
                                  runner.stream,
                                  verbosity=self.conf.verbosity,

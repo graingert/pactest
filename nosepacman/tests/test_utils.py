@@ -5,7 +5,7 @@ from unittest import TestCase
 from nose.tools import eq_
 from nose.util import src
 
-from noseprogressive.utils import human_path, index_of_test_frame
+from nosepacman.utils import human_path, index_of_test_frame
 
 
 class DummyCase(TestCase):
@@ -55,7 +55,7 @@ def test_index_when_syntax_error_below_test_frame():
     extracted_tb = [('/nose/case.py', 183, 'runTest', 'self.test(*self.arg)'),
                     # Legit path so the frame finder can compare to the address of DummyCase:
                     (src(realpath(__file__)), 34, 'test_index_when_syntax_error_below_test_frame', 'deeper()'),
-                    ('/noseprogressive/tests/test_utils.py', 33, 'deeper', 'import noseprogressive.tests.syntaxerror')]
+                    ('/nosepacman/tests/test_utils.py', 33, 'deeper', 'import nosepacman.tests.syntaxerror')]
     eq_(index_of_test_frame(extracted_tb,
                             SyntaxError,
                             SyntaxError('invalid syntax',

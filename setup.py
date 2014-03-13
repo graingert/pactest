@@ -8,11 +8,11 @@ setup(
     packages=find_packages(where="src", exclude=['ez_setup']),
     install_requires=['pyglet'],
     test_suite='nose.collector',
-    url='https://github.com/graingert/pactest',
+    url='https://github.com/neob91/nose-pacman',
     include_package_data=True,
     entry_points={
         'nose.plugins.0.10': [
-            "nosepacman = nose_pacman:PacmanPlugin"
+            "nosepacman = nosepacman:PacmanPlugin"
         ]
     },
 )

@@ -9,7 +9,7 @@ except ImportError:
 from blessings import Terminal
 from nose.tools import eq_
 
-from noseprogressive.bar import ProgressBar
+from nosepacman.bar import ProgressBar
 
 
 class MockTerminal(Terminal):

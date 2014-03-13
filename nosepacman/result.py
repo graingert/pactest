@@ -5,12 +5,12 @@ from nose.plugins.skip import SkipTest
 from nose.result import TextTestResult
 from nose.util import isclass
 
-from noseprogressive.bar import ProgressBar, NullProgressBar
-from noseprogressive.tracebacks import format_traceback, extract_relevant_tb
-from noseprogressive.utils import nose_selector, index_of_test_frame
+from nosepacman.bar import ProgressBar, NullProgressBar
+from nosepacman.tracebacks import format_traceback, extract_relevant_tb
+from nosepacman.utils import nose_selector, index_of_test_frame
 
 
-class ProgressiveResult(TextTestResult):
+class PacmanResult(TextTestResult):
     """Test result which updates a progress bar instead of printing dots
 
     Nose's ResultProxy will wrap it, and other plugins can still print
@@ -19,7 +19,7 @@ class ProgressiveResult(TextTestResult):
 
     """
     def __init__(self, cwd, total_tests, stream, config=None):
-        super(ProgressiveResult, self).__init__(stream, None, 0, config=config)
+        super(PacmanResult, self).__init__(stream, None, 0, config=config)
         self._cwd = cwd
         self._options = config.options
         self._term = Terminal(stream=stream,
@@ -40,7 +40,7 @@ class ProgressiveResult(TextTestResult):
 
     def startTest(self, test):
         """Update the progress bar."""
-        super(ProgressiveResult, self).startTest(test)
+        super(PacmanResult, self).startTest(test)
         self.bar.update(nose_selector(test), self.testsRun)
 
     def _printTraceback(self, test, err):
@@ -162,7 +162,7 @@ class ProgressiveResult(TextTestResult):
             self._printTraceback(test, err)
 
     def addFailure(self, test, err):
-        super(ProgressiveResult, self).addFailure(test, err)
+        super(PacmanResult, self).addFailure(test, err)
         self._printHeadline('FAIL', test)
         self._printTraceback(test, err)
 

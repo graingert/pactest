@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for traceback formatting."""
 
-from noseprogressive.tracebacks import format_traceback
+from nosepacman.tracebacks import format_traceback
 
 
 syntax_error_tb = ([
@@ -32,7 +32,7 @@ syntax_error_tb = ([
      ("/usr/lib64/python2.4/urllib2.py", 573, '<lambda>', """lambda r, proxy=url, type=type, meth=self.proxy_open: \\"""),
      ("/usr/lib64/python2.4/urllib2.py", 580, 'proxy_open', """if '@' in host:""")
      # Was originally TypeError: iterable argument required
-    ], SyntaxError, SyntaxError('invalid syntax', ('/Users/erose/Checkouts/nose-progress/noseprogressive/tests/test_integration.py', 97, 5, '    :bad\n')))
+    ], SyntaxError, SyntaxError('invalid syntax', ('/Users/erose/Checkouts/nose-progress/nosepacman/tests/test_integration.py', 97, 5, '    :bad\n')))
 attr_error_tb = ([
      ("/usr/share/PackageKit/helpers/yum/yumBackend.py", 2926, 'install_signature', """self.yumbase.getKeyForPackage(pkg, askcb = lambda x, y, z: True)"""),
      ("/usr/lib/python2.6/site-packages/yum/__init__.py", 4309, 'getKeyForPackage', """result = ts.pgpImportPubkey(misc.procgpgkey(info['raw_key']))"""),

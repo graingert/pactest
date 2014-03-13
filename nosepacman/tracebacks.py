@@ -8,7 +8,7 @@ from traceback import extract_tb, format_exception_only
 from blessings import Terminal
 from nose.util import src
 
-from noseprogressive.utils import human_path
+from nosepacman.utils import human_path
 
 
 DEFAULT_EDITOR_SHORTCUT_TEMPLATE = (u'  {dim_format}{editor} '

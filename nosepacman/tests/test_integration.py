@@ -5,12 +5,12 @@ from nose.plugins import PluginTester
 from nose.plugins.skip import Skip
 from nose.tools import eq_
 
-from noseprogressive import ProgressivePlugin
+from nosepacman import PacmanPlugin
 
 
 class IntegrationTestCase(PluginTester, TestCase):
-    activate = '--with-progressive'
-    plugins = [ProgressivePlugin(), Skip()]
+    activate = '--with-pacman'
+    plugins = [PacmanPlugin(), Skip()]
 
     def _count_eq(self, text, count):
         """Assert `text` appears `count` times in the captured output."""
@@ -56,8 +56,8 @@ class HookTests(IntegrationTestCase):
 
 
 class AdvisoryShowingTests(IntegrationTestCase):
-    """Tests for --progressive-advisories option"""
-    args = ['--progressive-advisories']
+    """Tests for --pacman-advisories option"""
+    args = ['--pacman-advisories']
 
     def makeSuite(self):
         class Skip(TestCase):

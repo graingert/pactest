@@ -2,14 +2,14 @@ from time import time
 
 import nose.core
 
-from noseprogressive.result import ProgressiveResult
+from nosepacman.result import PacmanResult
 
 
-class ProgressiveRunner(nose.core.TextTestRunner):
+class PacmanRunner(nose.core.TextTestRunner):
     """Test runner that makes a lot less noise than TextTestRunner"""
 
     def __init__(self, cwd, totalTests, stream, **kwargs):
-        super(ProgressiveRunner, self).__init__(stream, **kwargs)
+        super(PacmanRunner, self).__init__(stream, **kwargs)
         self._cwd = cwd
         self._totalTests = totalTests
 
@@ -18,10 +18,10 @@ class ProgressiveRunner(nose.core.TextTestRunner):
 
         Nose's ResultProxy will wrap it, and other plugins can still print
         stuff---but without smashing into our progress bar, care of
-        ProgressivePlugin's stderr/out wrapping.
+        PacmanPlugin's stderr/out wrapping.
 
         """
-        return ProgressiveResult(self._cwd,
+        return PacmanResult(self._cwd,
                                  self._totalTests,
                                  self.stream,
                                  config=self.config)
