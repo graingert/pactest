@@ -19,7 +19,7 @@ class PacmanResult(TextTestResult):
 
     """
 
-    RESULT_SUCCSS = 0
+    RESULT_SUCCESS = 0
     RESULT_FAILURE = 1
     RESULT_ERROR = 2
 
@@ -160,6 +160,7 @@ class PacmanResult(TextTestResult):
                 self.stream.writeln(reason)
 
     def addError(self, test, err):
+        super(PacmanResult, self).addError(test, err)
         # We don't read this, but some other plugin might conceivably expect it
         # to be there:
         excInfo = self._exc_info_to_string(err, test)
@@ -177,15 +178,15 @@ class PacmanResult(TextTestResult):
         self.stream.writeln('hoho')
 
     def addSuccess(self, test):
+        super(PacmanResult, self).addSuccess(test)
         self._results.append(self.RESULT_SUCCESS)
         self.stream.writeln(':)')
 
-    def stopTestRun(self):
-        self.stream.writeln('Tests finished')
-
     def printSummary(self, start, stop):
-        return super(PacmanResult, self).printSummary(start, stop)
         """As a final summary, print number of tests, broken down by result."""
+        self.stream.writeln('Tests completed, running pacman!')
+        self.stream.writeln(repr(self._results))
+        self.printErrors()
         def renderResultType(type, number, is_failure):
             """Return a rendering like '2 failures'.
 

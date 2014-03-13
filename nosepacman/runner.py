@@ -51,7 +51,6 @@ class PacmanRunner(nose.core.TextTestRunner):
         # sure other plugins get a chance to report:
         self.config.plugins.report(self.stream)
 
-        #result.printErrors()
         result.printSummary(startTime, stopTime)
         self.config.plugins.finalize(result)
         return result

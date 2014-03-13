@@ -75,3 +75,6 @@ def test_monochrome_bar():
                                  term.reverse('       '),
                                  '_______',
                                  term.restore]))
+
+def test_blah():
+    pass
