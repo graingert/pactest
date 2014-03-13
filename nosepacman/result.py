@@ -18,12 +18,18 @@ class PacmanResult(TextTestResult):
     stderr/out wrapping.
 
     """
+
+    RESULT_SUCCSS = 0
+    RESULT_FAILURE = 1
+    RESULT_ERROR = 2
+
     def __init__(self, cwd, total_tests, stream, config=None):
         super(PacmanResult, self).__init__(stream, None, 0, config=config)
         self._cwd = cwd
         self._options = config.options
         self._term = Terminal(stream=stream,
                               force_styling=config.options.with_styling)
+        self._results = []
 
         if self._term.is_a_tty or self._options.with_bar:
             # 1 in case test counting failed and returned 0
@@ -130,9 +136,9 @@ class PacmanResult(TextTestResult):
             test.passed = False
 
         is_any_failure = not is_error_class or is_failure
-        self._printHeadline(label if is_error_class else 'ERROR',
-                            test,
-                            is_failure=is_any_failure)
+        #self._printHeadline(label if is_error_class else 'ERROR',
+        #                    test,
+        #                    is_failure=is_any_failure)
         return is_any_failure
 
     def addSkip(self, test, reason):
@@ -158,15 +164,27 @@ class PacmanResult(TextTestResult):
         # to be there:
         excInfo = self._exc_info_to_string(err, test)
         is_failure = self._recordAndPrintHeadline(test, err[0], excInfo)
-        if is_failure:
-            self._printTraceback(test, err)
+        #if is_failure:
+        #    self._printTraceback(test, err)
+        self._results.append(self.RESULT_ERROR)
+        self.stream.writeln('haha')
 
     def addFailure(self, test, err):
         super(PacmanResult, self).addFailure(test, err)
-        self._printHeadline('FAIL', test)
-        self._printTraceback(test, err)
+        self._results.append(self.RESULT_FAILURE)
+        #self._printHeadline('FAIL', test)
+        #self._printTraceback(test, err)
+        self.stream.writeln('hoho')
+
+    def addSuccess(self, test):
+        self._results.append(self.RESULT_SUCCESS)
+        self.stream.writeln(':)')
+
+    def stopTestRun(self):
+        self.stream.writeln('Tests finished')
 
     def printSummary(self, start, stop):
+        return super(PacmanResult, self).printSummary(start, stop)
         """As a final summary, print number of tests, broken down by result."""
         def renderResultType(type, number, is_failure):
             """Return a rendering like '2 failures'.
