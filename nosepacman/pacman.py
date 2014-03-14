@@ -3,7 +3,7 @@ from itertools import cycle
 from signal import signal, SIGWINCH
 import time
 
-from .audio import play_chomp
+from .audio import play_chomp, play_death
 
 __all__ = ['ProgressBar', 'NullProgressBar']
 
@@ -61,16 +61,21 @@ class PacmanDisplay(object):
         self._term.stream.flush()
 
     def eat(self):
+        dead = False
         for i, char in enumerate(self._queue):
-            play_chomp()
             if char in [DOT_SIGN, SKIP_SIGN]:
                 new_char = ' '
+                play_chomp()
             elif char in [FAIL_SIGN, ERROR_SIGN]:
                 new_char = CRASH_SIGN
+                play_death()
+                dead = True
             self._queue[i] = PACMAN_SIGN
             self._redraw()
             self._queue[i] = new_char
             time.sleep(0.3)
+            if dead:
+                break
         self._flush()
 
 
